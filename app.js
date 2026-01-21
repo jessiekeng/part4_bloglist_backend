@@ -1,9 +1,13 @@
 const config = require('./utils/config')
 const express = require('express')
-const app = express()
-const cors = require('cors')
+const app = express() 
+const cors = require('cors') 
+
 const blogsRouter = require('./controllers/blogs')
-const middleware = require('./utils/middleware') // 1. Import middleware
+const usersRouter = require('./controllers/users')
+const loginRouter = require('./controllers/login')
+
+const middleware = require('./utils/middleware')
 const logger = require('./utils/logger')
 const mongoose = require('mongoose')
 
@@ -20,12 +24,21 @@ mongoose.connect(config.MONGODB_URI)
   })
 
 app.use(cors())
+app.use(express.static('build'))
 app.use(express.json())
-app.use(middleware.requestLogger) // 2. Use request logger
+app.use(middleware.requestLogger)
 
-app.use('/api/blogs', blogsRouter)
+// 1. tokenExtractor must be global so it runs for all routes
+app.use(middleware.tokenExtractor)
 
-app.use(middleware.unknownEndpoint) // 3. Use unknown endpoint handler
-app.use(middleware.errorHandler)    // 4. Use error handler
+// 2. Register the routes
+app.use('/api/login', loginRouter)
+app.use('/api/users', usersRouter)
+
+// 3. Apply userExtractor only to blog routes as per Exercise 4.22
+app.use('/api/blogs', middleware.userExtractor, blogsRouter)
+
+app.use(middleware.unknownEndpoint)
+app.use(middleware.errorHandler)
 
 module.exports = app

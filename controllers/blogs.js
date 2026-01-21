@@ -1,51 +1,83 @@
-const blogsRouter = require('express').Router() 
-const Blog = require('../models/blog')          
+const blogsRouter = require('express').Router()
+const Blog = require('../models/blog')
 
-// Now your routes will work
+// GET all blogs remains public and stays the same
 blogsRouter.get('/', async (request, response) => {
-  const blogs = await Blog.find({})
+  const blogs = await Blog
+    .find({})
+    .populate('user', { username: 1, name: 1 })
+
   response.json(blogs)
 })
 
-blogsRouter.post('/', async (request, response) => {
-  const body = request.body
+// POST - Now uses request.user provided by userExtractor middleware
+// controllers/blogs.js
 
-  if (!body.title || !body.url) {
+blogsRouter.post('/', async (request, response) => {
+  const { title, author, url, likes } = request.body
+  const user = request.user // From userExtractor
+
+  // 1. ADD THIS CHECK: If user is missing, return 401
+  if (!user) {
+    return response.status(401).json({ error: 'token missing or invalid' })
+  }
+
+  if (!title || !url) {
     return response.status(400).end()
   }
 
   const blog = new Blog({
-    title: body.title,
-    author: body.author,
-    url: body.url,
-    likes: body.likes || 0
+    title,
+    author,
+    url,
+    likes: likes || 0,
+    user: user._id // This was the line causing the crash
   })
 
   const savedBlog = await blog.save()
+  user.blogs = user.blogs.concat(savedBlog._id)
+  await user.save()
+
   response.status(201).json(savedBlog)
 })
 
-// DELETE a single blog post
+// DELETE - Secured: Only the creator can delete
 blogsRouter.delete('/:id', async (request, response) => {
-  // request.params.id captures the ID from the URL string
-  await Blog.findByIdAndDelete(request.params.id)
+  const user = request.user // From userExtractor
   
-  // 204 means the request was successful, but there is no content to send back
+  // 1. Check if user was successfully extracted
+  if (!user) {
+    return response.status(401).json({ error: 'token missing or invalid' })
+  }
+
+  const blog = await Blog.findById(request.params.id)
+
+  if (!blog) {
+    return response.status(404).json({ error: 'blog not found' })
+  }
+
+  // 2. Safeguard: If the blog has no user field at all (from old test data)
+  if (!blog.user) {
+    return response.status(401).json({ error: 'blog has no creator information' })
+  }
+
+  // 3. Perform the comparison
+  if (blog.user.toString() !== user._id.toString()) {
+    return response.status(401).json({ 
+      error: 'unauthorized: only the creator can delete this blog' 
+    })
+  }
+
+  await Blog.findByIdAndDelete(request.params.id)
   response.status(204).end()
 })
 
-// PUT (Update) a single blog post
+// PUT - Update a blog (usually likes)
 blogsRouter.put('/:id', async (request, response) => {
-  const body = request.body
+  const { title, author, url, likes } = request.body
 
-  const blog = {
-    title: body.title,
-    author: body.author,
-    url: body.url,
-    likes: body.likes
-  }
+  const blog = { title, author, url, likes }
 
-  // { new: true } tells Mongoose to return the modified document instead of the original
   const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
   
   if (updatedBlog) {
@@ -55,4 +87,4 @@ blogsRouter.put('/:id', async (request, response) => {
   }
 })
 
-module.exports = blogsRouter // Don't forget this at the bottom!
+module.exports = blogsRouter
