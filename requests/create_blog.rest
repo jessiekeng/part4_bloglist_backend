@@ -1,12 +1,8 @@
-POST http://localhost:3003/api/blogs
+POST http://localhost:3003/api/users
 Content-Type: application/json
 
 {
-  "title": "Full Stack Open is Awesome",
-  "author": "Zixing Keng",
-  "url": "https://fullstackopen.com/",
-  "likes": 10
+  "username": "testuser",
+  "name": "Test User",
+  "password": "password123"
 }
-
-###
-GET http://localhost:3003/api/blogs
