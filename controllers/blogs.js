@@ -1,23 +1,59 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 
-// GET all blogs remains public and stays the same
+/**
+ * @openapi
+ * /api/blogs:
+ * get:
+ * summary: Retrieve all blogs
+ * tags: [Blogs]
+ * responses:
+ * 200:
+ * description: A list of blogs
+ */
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog
     .find({})
     .populate('user', { username: 1, name: 1 })
-
   response.json(blogs)
 })
 
-// POST - Now uses request.user provided by userExtractor middleware
-// controllers/blogs.js
-
+/**
+ * @openapi
+ * /api/blogs:
+ * post:
+ * summary: Create a new blog
+ * tags: [Blogs]
+ * security:
+ * - bearerAuth: []
+ * requestBody:
+ * required: true
+ * content:
+ * application/json:
+ * schema:
+ * type: object
+ * required:
+ * - title
+ * - url
+ * properties:
+ * title:
+ * type: string
+ * author:
+ * type: string
+ * url:
+ * type: string
+ * likes:
+ * type: integer
+ * responses:
+ * 201:
+ * description: Created
+ * 401:
+ * description: Unauthorized
+ */
 blogsRouter.post('/', async (request, response) => {
   const { title, author, url, likes } = request.body
-  const user = request.user // From userExtractor
+  const user = request.user 
 
-  // 1. ADD THIS CHECK: If user is missing, return 401
   if (!user) {
     return response.status(401).json({ error: 'token missing or invalid' })
   }
@@ -31,7 +67,7 @@ blogsRouter.post('/', async (request, response) => {
     author,
     url,
     likes: likes || 0,
-    user: user._id // This was the line causing the crash
+    user: user._id 
   })
 
   const savedBlog = await blog.save()
@@ -41,50 +77,70 @@ blogsRouter.post('/', async (request, response) => {
   response.status(201).json(savedBlog)
 })
 
-// DELETE - Secured: Only the creator can delete
+/**
+ * @openapi
+ * /api/blogs/{id}:
+ * delete:
+ * summary: Delete a blog
+ * tags: [Blogs]
+ * security:
+ * - bearerAuth: []
+ * parameters:
+ * - in: path
+ * name: id
+ * required: true
+ * schema:
+ * type: string
+ * responses:
+ * 204:
+ * description: Deleted
+ * 401:
+ * description: Unauthorized
+ */
 blogsRouter.delete('/:id', async (request, response) => {
-  const user = request.user // From userExtractor
-  
-  // 1. Check if user was successfully extracted
-  if (!user) {
-    return response.status(401).json({ error: 'token missing or invalid' })
-  }
+  const user = request.user 
+  if (!user) return response.status(401).json({ error: 'token missing or invalid' })
 
   const blog = await Blog.findById(request.params.id)
+  if (!blog) return response.status(404).json({ error: 'blog not found' })
 
-  if (!blog) {
-    return response.status(404).json({ error: 'blog not found' })
-  }
-
-  // 2. Safeguard: If the blog has no user field at all (from old test data)
-  if (!blog.user) {
-    return response.status(401).json({ error: 'blog has no creator information' })
-  }
-
-  // 3. Perform the comparison
   if (blog.user.toString() !== user._id.toString()) {
-    return response.status(401).json({ 
-      error: 'unauthorized: only the creator can delete this blog' 
-    })
+    return response.status(401).json({ error: 'unauthorized' })
   }
 
   await Blog.findByIdAndDelete(request.params.id)
   response.status(204).end()
 })
 
-// PUT - Update a blog (usually likes)
+/**
+ * @openapi
+ * /api/blogs/{id}:
+ * put:
+ * summary: Update a blog
+ * tags: [Blogs]
+ * parameters:
+ * - in: path
+ * name: id
+ * required: true
+ * schema:
+ * type: string
+ * requestBody:
+ * content:
+ * application/json:
+ * schema:
+ * type: object
+ * properties:
+ * likes:
+ * type: integer
+ * responses:
+ * 200:
+ * description: Updated
+ */
 blogsRouter.put('/:id', async (request, response) => {
   const { title, author, url, likes } = request.body
-
   const blog = { title, author, url, likes }
-
   const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
-  
-  if (updatedBlog) {
-    response.json(updatedBlog)
-  } else {
-    response.status(404).end()
-  }
+  updatedBlog ? response.json(updatedBlog) : response.status(404).end()
 })
 
 module.exports = blogsRouter

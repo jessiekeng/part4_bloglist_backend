@@ -7,6 +7,9 @@ const blogsRouter = require('./controllers/blogs')
 const usersRouter = require('./controllers/users')
 const loginRouter = require('./controllers/login')
 
+// Import Swagger utilities
+const { swaggerUi, specs } = require('./utils/swagger')
+
 const middleware = require('./utils/middleware')
 const logger = require('./utils/logger')
 const mongoose = require('mongoose')
@@ -27,6 +30,10 @@ app.use(cors())
 app.use(express.static('build'))
 app.use(express.json())
 app.use(middleware.requestLogger)
+
+// --- Swagger Documentation Route ---
+// Recruiter tip: Place this before your API routes so it's easily accessible
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs))
 
 // 1. tokenExtractor must be global so it runs for all routes
 app.use(middleware.tokenExtractor)
