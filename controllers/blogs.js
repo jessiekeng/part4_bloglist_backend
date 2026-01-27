@@ -4,12 +4,12 @@ const Blog = require('../models/blog')
 /**
  * @openapi
  * /api/blogs:
- * get:
- * summary: Retrieve all blogs
- * tags: [Blogs]
- * responses:
- * 200:
- * description: A list of blogs
+ *   get:
+ *     summary: Retrieve all blogs
+ *     tags: [Blogs]
+ *     responses:
+ *       200:
+ *         description: A list of blogs
  */
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog
@@ -21,34 +21,34 @@ blogsRouter.get('/', async (request, response) => {
 /**
  * @openapi
  * /api/blogs:
- * post:
- * summary: Create a new blog
- * tags: [Blogs]
- * security:
- * - bearerAuth: []
- * requestBody:
- * required: true
- * content:
- * application/json:
- * schema:
- * type: object
- * required:
- * - title
- * - url
- * properties:
- * title:
- * type: string
- * author:
- * type: string
- * url:
- * type: string
- * likes:
- * type: integer
- * responses:
- * 201:
- * description: Created
- * 401:
- * description: Unauthorized
+ *   post:
+ *     summary: Create a new blog
+ *     tags: [Blogs]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - title
+ *               - url
+ *             properties:
+ *               title:
+ *                 type: string
+ *               author:
+ *                 type: string
+ *               url:
+ *                 type: string
+ *               likes:
+ *                 type: integer
+ *     responses:
+ *       201:
+ *         description: Created
+ *       401:
+ *         description: Unauthorized
  */
 blogsRouter.post('/', async (request, response) => {
   const { title, author, url, likes } = request.body
@@ -80,22 +80,22 @@ blogsRouter.post('/', async (request, response) => {
 /**
  * @openapi
  * /api/blogs/{id}:
- * delete:
- * summary: Delete a blog
- * tags: [Blogs]
- * security:
- * - bearerAuth: []
- * parameters:
- * - in: path
- * name: id
- * required: true
- * schema:
- * type: string
- * responses:
- * 204:
- * description: Deleted
- * 401:
- * description: Unauthorized
+ *   delete:
+ *     summary: Delete a blog
+ *     tags: [Blogs]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       204:
+ *         description: Deleted
+ *       401:
+ *         description: Unauthorized
  */
 blogsRouter.delete('/:id', async (request, response) => {
   const user = request.user 
@@ -115,26 +115,26 @@ blogsRouter.delete('/:id', async (request, response) => {
 /**
  * @openapi
  * /api/blogs/{id}:
- * put:
- * summary: Update a blog
- * tags: [Blogs]
- * parameters:
- * - in: path
- * name: id
- * required: true
- * schema:
- * type: string
- * requestBody:
- * content:
- * application/json:
- * schema:
- * type: object
- * properties:
- * likes:
- * type: integer
- * responses:
- * 200:
- * description: Updated
+ *   put:
+ *     summary: Update a blog
+ *     tags: [Blogs]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               likes:
+ *                 type: integer
+ *     responses:
+ *       200:
+ *         description: Updated
  */
 blogsRouter.put('/:id', async (request, response) => {
   const { title, author, url, likes } = request.body
