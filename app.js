@@ -7,9 +7,7 @@ const blogsRouter = require('./controllers/blogs')
 const usersRouter = require('./controllers/users')
 const loginRouter = require('./controllers/login')
 
-// Import Swagger utilities
 const { swaggerUi, specs } = require('./utils/swagger')
-
 const middleware = require('./utils/middleware')
 const logger = require('./utils/logger')
 const mongoose = require('mongoose')
@@ -27,23 +25,20 @@ mongoose.connect(config.MONGODB_URI)
   })
 
 app.use(cors())
-// UPDATED: Changed 'build' to 'dist' to match Vite's production output
 app.use(express.static('dist')) 
 app.use(express.json())
 app.use(middleware.requestLogger)
 
-// --- Swagger Documentation Route ---
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs))
 
-// 1. tokenExtractor must be global so it runs for all routes
+// tokenExtractor stays global to parse tokens if they exist
 app.use(middleware.tokenExtractor)
 
-// 2. Register the routes
 app.use('/api/login', loginRouter)
 app.use('/api/users', usersRouter)
 
-// 3. Apply userExtractor only to blog routes as per Exercise 4.22
-app.use('/api/blogs', middleware.userExtractor, blogsRouter)
+// UPDATED: Removed userExtractor from here to allow public GET and PUT
+app.use('/api/blogs', blogsRouter)
 
 app.use(middleware.unknownEndpoint)
 app.use(middleware.errorHandler)

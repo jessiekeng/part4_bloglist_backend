@@ -1,15 +1,12 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
+const middleware = require('../utils/middleware') // Added import
 
 /**
  * @openapi
  * /api/blogs:
- *   get:
- *     summary: Retrieve all blogs
- *     tags: [Blogs]
- *     responses:
- *       200:
- *         description: A list of blogs
+ * get:
+ * summary: Retrieve all blogs
  */
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog
@@ -21,36 +18,11 @@ blogsRouter.get('/', async (request, response) => {
 /**
  * @openapi
  * /api/blogs:
- *   post:
- *     summary: Create a new blog
- *     tags: [Blogs]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - title
- *               - url
- *             properties:
- *               title:
- *                 type: string
- *               author:
- *                 type: string
- *               url:
- *                 type: string
- *               likes:
- *                 type: integer
- *     responses:
- *       201:
- *         description: Created
- *       401:
- *         description: Unauthorized
+ * post:
+ * summary: Create a new blog
  */
-blogsRouter.post('/', async (request, response) => {
+// UPDATED: Added userExtractor here
+blogsRouter.post('/', middleware.userExtractor, async (request, response) => {
   const { title, author, url, likes } = request.body
   const user = request.user 
 
@@ -80,24 +52,11 @@ blogsRouter.post('/', async (request, response) => {
 /**
  * @openapi
  * /api/blogs/{id}:
- *   delete:
- *     summary: Delete a blog
- *     tags: [Blogs]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       204:
- *         description: Deleted
- *       401:
- *         description: Unauthorized
+ * delete:
+ * summary: Delete a blog
  */
-blogsRouter.delete('/:id', async (request, response) => {
+// UPDATED: Added userExtractor here
+blogsRouter.delete('/:id', middleware.userExtractor, async (request, response) => {
   const user = request.user 
   if (!user) return response.status(401).json({ error: 'token missing or invalid' })
 
@@ -115,27 +74,10 @@ blogsRouter.delete('/:id', async (request, response) => {
 /**
  * @openapi
  * /api/blogs/{id}:
- *   put:
- *     summary: Update a blog
- *     tags: [Blogs]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     requestBody:
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               likes:
- *                 type: integer
- *     responses:
- *       200:
- *         description: Updated
+ * put:
+ * summary: Update a blog
  */
+// PUBLIC: No userExtractor, allowing public likes
 blogsRouter.put('/:id', async (request, response) => {
   const { title, author, url, likes } = request.body
   const blog = { title, author, url, likes }
