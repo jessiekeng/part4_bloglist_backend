@@ -27,12 +27,12 @@ mongoose.connect(config.MONGODB_URI)
   })
 
 app.use(cors())
-app.use(express.static('build'))
+// UPDATED: Changed 'build' to 'dist' to match Vite's production output
+app.use(express.static('dist')) 
 app.use(express.json())
 app.use(middleware.requestLogger)
 
 // --- Swagger Documentation Route ---
-// Recruiter tip: Place this before your API routes so it's easily accessible
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs))
 
 // 1. tokenExtractor must be global so it runs for all routes
