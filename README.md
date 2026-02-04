@@ -48,20 +48,21 @@ A full-stack **MERN** application for managing blog lists, featuring secure auth
 ```bash
 git clone https://github.com/jessiekeng/part4_bloglist_backend.git
 cd part4_bloglist_backend
+```
 
 ### 2. Install Dependencies
+Run the following command to install all required packages:
 ```bash
 npm install
+```
 
 ### 3. Environment Setup
-Create a `.env` file in the root directory and add:
-```env
+Create a .env file in the root directory and add your environment variables:
 MONGODB_URI=your_mongodb_connection_string
 SECRET=your_jwt_secret
 
 ### 4. Run the Application
-Run the development server with the following command:
+Start the development server with:
 ```bash
+```
 npm run dev
-
-
