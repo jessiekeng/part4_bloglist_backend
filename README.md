@@ -1,39 +1,65 @@
-BlogStack
-A full-stack MERN application for managing blog lists, featuring secure authentication and role-based permissions.
+# BlogStack
 
-🚀 Live Demo
+A full-stack **MERN** application for managing blog lists, featuring secure authentication and role-based permissions.
 
-🛠 Tech Stack
+## 🚀 Live Demo
+> _(Add your live demo link here when ready)_
 
-Frontend: React (Vite), Axios
+---
 
-Backend: Node.js, Express, MongoDB
+## 🛠 Tech Stack
 
-Auth: JWT (JSON Web Tokens)
+**Frontend**
+- React (Vite)
+- Axios
 
-Deployment: Render (CI/CD)
+**Backend**
+- Node.js
+- Express
+- MongoDB (Mongoose)
 
-✨ Core Features
+**Authentication**
+- JWT (JSON Web Tokens)
 
-RESTful API: Robust backend for managing blog resources.
+**Deployment**
+- Render (with CI/CD)
 
-Secure Authentication: JWT-based login and session persistence.
+---
 
-Access Control: Custom middleware (RBAC) to protect CRUD operations and user data.
+## ✨ Core Features
 
-Automated Deployment: Integrated CI/CD pipeline for seamless updates.
+- **RESTful API**  
+  Clean and scalable backend architecture for managing blog resources.
 
-🚀 Quick Start
+- **Secure Authentication**  
+  JWT-based login with persistent sessions.
 
-Clone & Install:
+- **Role-Based Access Control (RBAC)**  
+  Custom middleware to restrict CRUD operations based on user roles.
 
-Bash
+- **Automated Deployment**  
+  CI/CD pipeline on Render for seamless production updates.
+
+---
+
+## 🚀 Quick Start
+
+### 1. Clone the Repository
+```bash
 git clone https://github.com/jessiekeng/part4_bloglist_backend.git
+cd part4_bloglist_backend
+
+### 2. Install Dependencies
+```bash
 npm install
-Environment: Create a .env file with MONGODB_URI and SECRET.
 
-Run:
+###3. Environment Setup
+```bash
+MONGODB_URI=your_mongodb_connection_string
+SECRET=your_jwt_secret
 
-Bash
+###4. Run the Application
+```bash
 npm run dev
-Developed by Jessie Keng
+
+
