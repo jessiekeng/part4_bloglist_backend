@@ -53,12 +53,14 @@ cd part4_bloglist_backend
 ```bash
 npm install
 
-###3. Environment Setup
-```bash
+### 3. Environment Setup
+Create a `.env` file in the root directory and add:
+```env
 MONGODB_URI=your_mongodb_connection_string
 SECRET=your_jwt_secret
 
-###4. Run the Application
+### 4. Run the Application
+Run the development server with the following command:
 ```bash
 npm run dev
 
