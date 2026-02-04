@@ -64,5 +64,6 @@ SECRET=your_jwt_secret
 ### 4. Run the Application
 Start the development server with:
 ```bash
-```
 npm run dev
+```
+
